@@ -1,26 +1,7 @@
-# bun starter
+# Lambda Client SDK
 
 ## Getting Started
 
-Click the [Use this template](https://github.com/wobsoriano/bun-lib-starter/generate) button to create a new repository with the contents starter.
+This SDK allows you to interact with Lambda Protocol contracts. You can query anything from the protocol. And there are helper methods for LRC-20 Tokens
 
-OR
-
-Run `bun create wobsoriano/bun-lib-starter ./my-lib`.
-
-## Setup
-
-```bash
-# install dependencies
-bun install
-
-# test the app
-bun test
-
-# build the app, available under dist
-bun run build
-```
-
-## License
-
-MIT
+create a client with `lambda(baseUrl)` and then you can call any of the methods.
