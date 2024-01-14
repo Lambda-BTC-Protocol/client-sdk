@@ -1,21 +1,8 @@
 import { Token } from "./Token";
 import { Query } from "./Query";
+import JSONbig from "json-bigint";
 
-const queryToken = async (url: string, contract: string): Promise<Token> => {
-  const response = await queryMultiple(url, [
-    { function: "name", contract: contract, args: [] },
-    { function: "symbol", contract: contract, args: [] },
-    { function: "totalSupply", contract: contract, args: [] },
-    { function: "decimals", contract: contract, args: [] },
-  ]);
-  const [name, symbol, totalSupply, decimals] = response as [
-    string,
-    string,
-    number,
-    number,
-  ];
-  return new Token(contract, decimals, name, symbol, totalSupply, url);
-};
+const jsonBig = JSONbig({ useNativeBigInt: true });
 
 const querySingle = async (url: string, query: Query): Promise<unknown> => {
   const singleUrl = new URL(url.endsWith("/") ? url + "query" : url + "/query");
@@ -25,8 +12,8 @@ const querySingle = async (url: string, query: Query): Promise<unknown> => {
   });
   singleUrl.search = params.toString();
   return await fetch(singleUrl, {})
-    .then((res) => res.json())
-    .then((res) => res.result);
+    .then((res) => res.text())
+    .then((res) => jsonBig.parse(res));
 };
 
 const queryMultiple = async (
@@ -43,7 +30,25 @@ const queryMultiple = async (
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-  }).then((res) => res.json());
+  })
+    .then((res) => res.text())
+    .then((res) => jsonBig.parse(res));
+};
+
+const queryToken = async (url: string, contract: string): Promise<Token> => {
+  const response = await queryMultiple(url, [
+    { function: "name", contract: contract, args: [] },
+    { function: "symbol", contract: contract, args: [] },
+    { function: "totalSupply", contract: contract, args: [] },
+    { function: "decimals", contract: contract, args: [] },
+  ]);
+  const [name, symbol, totalSupply, decimals] = response as [
+    string,
+    string,
+    bigint,
+    number,
+  ];
+  return { name, symbol, totalSupply, decimals, contract } satisfies Token;
 };
 
 const balanceOf = async (url: string, contract: string, wallet: string) => {
@@ -52,7 +57,7 @@ const balanceOf = async (url: string, contract: string, wallet: string) => {
     contract: contract,
     args: [wallet],
   } satisfies Query;
-  return querySingle(url, params) as Promise<number>;
+  return querySingle(url, params) as Promise<bigint>;
 };
 
 const formattedBalanceOf = async (
@@ -64,8 +69,8 @@ const formattedBalanceOf = async (
     { contract: contract, function: "balanceOf", args: [wallet] },
     { contract: contract, function: "decimals", args: [] },
   ]);
-  const [balance, decimals] = results as [number, number];
-  return balance / Math.pow(10, decimals);
+  const [balance, decimals] = results as [bigint, number];
+  return Number(balance) / Math.pow(10, decimals);
 };
 
 export const lambda = (url: string) => ({
