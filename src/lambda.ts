@@ -1,8 +1,6 @@
 import { Token } from "./Token";
 import { Query } from "./Query";
-import JSONbig from "json-bigint";
-
-const jsonBig = JSONbig({ useNativeBigInt: true });
+import { parse } from "superjson";
 
 const querySingle = async (url: string, query: Query): Promise<unknown> => {
   const singleUrl = new URL(url.endsWith("/") ? url + "query" : url + "/query");
@@ -13,7 +11,7 @@ const querySingle = async (url: string, query: Query): Promise<unknown> => {
   singleUrl.search = params.toString();
   return await fetch(singleUrl, {})
     .then((res) => res.text())
-    .then((res) => jsonBig.parse(res));
+    .then((res) => parse(res));
 };
 
 const queryMultiple = async (
@@ -32,7 +30,7 @@ const queryMultiple = async (
     },
   })
     .then((res) => res.text())
-    .then((res) => jsonBig.parse(res));
+    .then((res) => parse(res));
 };
 
 const queryToken = async (url: string, contract: string): Promise<Token> => {

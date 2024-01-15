@@ -31,5 +31,12 @@ const run = async () => {
     function: "name",
   });
   console.log(name);
+
+  const listings = await client.querySingle({
+    contract: "otc",
+    function: "listings",
+    args: [],
+  });
+  console.log(listings);
 };
 run();

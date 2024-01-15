@@ -1,6 +1,6 @@
 {
   "name": "lambda-client-sdk",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "description": "Client SDK for Lambda Protocol. Querying single or multiple data points from a smart contract in the Lambda Protocol.",
@@ -18,10 +18,9 @@
     "bun-plugin-dts": "^0.2.1",
     "@types/bun": "^1.0.0",
     "typescript": "^5.2.2",
-    "prettier": "^3.1.1",
-    "@types/json-bigint": "^1.0.4"
+    "prettier": "^3.1.1"
   },
   "dependencies": {
-    "json-bigint": "^1.0.0"
+    "superjson": "^2.2.1"
   }
 }
