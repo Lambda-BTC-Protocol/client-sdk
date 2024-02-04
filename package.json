@@ -1,6 +1,6 @@
 {
   "name": "lambda-client-sdk",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "description": "Client SDK for Lambda Protocol. Querying single or multiple data points from a smart contract in the Lambda Protocol.",

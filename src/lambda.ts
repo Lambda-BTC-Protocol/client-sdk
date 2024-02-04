@@ -49,6 +49,34 @@ const queryToken = async (url: string, contract: string): Promise<Token> => {
   return { name, symbol, totalSupply, decimals, contract } satisfies Token;
 };
 
+const queryMultipleTokens = async (
+  url: string,
+  contracts: string[],
+): Promise<Token[]> => {
+  const queries = contracts.flatMap((contract) => [
+    { function: "name", contract: contract, args: [] },
+    { function: "symbol", contract: contract, args: [] },
+    { function: "totalSupply", contract: contract, args: [] },
+    { function: "decimals", contract: contract, args: [] },
+  ]);
+  const response = await queryMultiple(url, queries);
+  const tokens: Token[] = [];
+  for (let i = 0; i < contracts.length; i++) {
+    const [name, symbol, totalSupply, decimals] = response.slice(
+      i * 4,
+      i * 4 + 4,
+    ) as [string, string, bigint, number];
+    tokens.push({
+      name,
+      symbol,
+      totalSupply,
+      decimals,
+      contract: contracts[i],
+    });
+  }
+  return tokens;
+};
+
 const balanceOf = async (url: string, contract: string, wallet: string) => {
   const params = {
     function: "balanceOf",
@@ -78,6 +106,14 @@ export const lambda = (url: string) => ({
    * @returns a token object containing name, symbol, totalSupply, decimals, and contract
    */
   queryToken: (contract: string) => queryToken(url, contract),
+  /**
+   * Query multiple tokens
+   * @param contracts
+   * @returns a an array of token objects containing name, symbol, totalSupply, decimals, and contract
+   */
+  queryTokens: (contracts: Array<string>) =>
+    queryMultipleTokens(url, contracts),
+
   /**
    * Query the balance of a wallet
    * @param contract

@@ -1,32 +1,35 @@
 import { lambda } from "./lambda";
 
-const client = lambda("http://localhost:4000");
+const client = lambda("https://query-server.fly.dev/");
 const run = async () => {
-  const balanceA = await client.balanceOf("proto", "walletA");
+  const balanceA = await client.balanceOf(
+    "LMDA",
+    "bc1p3dadye5ar65ekxkfh83lmgm2r90mlt5uqx2pfdfl7mdz48trdn8qnnznnu",
+  );
   console.log("proto balance", balanceA);
   const totalSupply = await client.querySingle({
-    contract: "demo",
+    contract: "LMDA",
     function: "totalSupply",
     args: [],
   });
   console.log("totalsupply", totalSupply);
   const bitcoin = await client.queryToken("bitcoin");
   console.log(bitcoin);
-  const demo = await client.queryToken("demo");
+  const demo = await client.queryToken("LMDA");
   console.log(demo);
   // const balance = await bitcoin.balanceOf("walletA");
   // const formattedBalance = await bitcoin.formattedBalanceOf("walletA");
   // console.log(balance, formattedBalance);
 
-  const pool = await client.querySingle({
-    contract: "amm",
-    function: "getPool",
-    args: ["proto"],
-  });
-  console.log(pool);
+  // const pool = await client.querySingle({
+  //   contract: "amm",
+  //   function: "getPool",
+  //   args: ["proto"],
+  // });
+  // console.log(pool);
 
   const name = await client.querySingle({
-    contract: "proto",
+    contract: "bitcoin",
     args: [],
     function: "name",
   });
@@ -38,5 +41,8 @@ const run = async () => {
     args: [],
   });
   console.log(listings);
+
+  const tokens = await client.queryTokens(["LMDA", "bitcoin", "dep:dmt:FIRST"]);
+  console.log("tokens", tokens);
 };
 run();
