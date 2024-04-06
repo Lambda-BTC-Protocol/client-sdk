@@ -1,6 +1,8 @@
 import { Token } from "./Token";
 import { Query } from "./Query";
 import { parse } from "superjson";
+import { Transaction } from "./Transaction";
+import { TransactionDetails } from "./TransactionDetails";
 
 const querySingle = async (url: string, query: Query): Promise<unknown> => {
   const singleUrl = new URL(url.endsWith("/") ? url + "query" : url + "/query");
@@ -99,6 +101,34 @@ const formattedBalanceOf = async (
   return Number(balance) / Math.pow(10, decimals);
 };
 
+const getBaseUrl = (url: string) => {
+  return url.endsWith("/") ? url : url + "/";
+};
+
+const transactionByHash = async (
+  url: string,
+  hash: string,
+): Promise<TransactionDetails> => {
+  const txnUrl = new URL(`${getBaseUrl(url)}txn/${hash}`);
+  return fetch(txnUrl).then((res) => res.json());
+};
+
+const transactionsByBlock = async (
+  url: string,
+  block: number,
+): Promise<Array<Transaction>> => {
+  const txnUrl = new URL(`${getBaseUrl(url)}txn/block/${block}`);
+  return fetch(txnUrl).then((res) => res.json());
+};
+
+const transactionsByAddress = async (
+  url: string,
+  wallet: string,
+): Promise<Array<Transaction>> => {
+  const txnUrl = new URL(`${getBaseUrl(url)}txn/wallet/${wallet}`);
+  return fetch(txnUrl).then((res) => res.json());
+};
+
 export const lambda = (url: string) => ({
   /**
    * Query a token
@@ -141,4 +171,25 @@ export const lambda = (url: string) => ({
    * @returns an array of results in the same order as the queries
    */
   queryMultiple: (queries: Query[]) => queryMultiple(url, queries),
+
+  /**
+   * Query transaction by hash
+   * @param hash
+   * @returns a transaction
+   */
+  transactionByHash: (hash: string) => transactionByHash(url, hash),
+
+  /**
+   * Query transactions by block
+   * @param block
+   * @returns an array of transactions
+   */
+  transactionsByBlock: (block: number) => transactionsByBlock(url, block),
+  /**
+   * Query transactions by address
+   * @param address
+   * @returns an array of transactions
+   */
+  transactionsByAddress: (address: string) =>
+    transactionsByAddress(url, address),
 });
